@@ -1,9 +1,27 @@
 import 'package:flutter/material.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   final VoidCallback onInitialized;
 
   const SplashPage({super.key, required this.onInitialized});
+
+  // @override
+  // SplashPageState createState() => SplashPageState();
+
+  @override
+  State<StatefulWidget> createState() {
+    return SplashPageState();
+  }
+}
+
+class SplashPageState extends State<SplashPage> {
+  @override
+  void initState() {
+    super.initState();
+    Future.delayed(Duration(seconds: 2), () {
+      widget.onInitialized();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -13,7 +31,7 @@ class SplashPage extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
       home: Center(
-        child : Container(
+        child: Container(
           height: 200,
           width: 200,
           decoration: BoxDecoration(
@@ -22,8 +40,8 @@ class SplashPage extends StatelessWidget {
               fit: BoxFit.contain,
             ),
           ),
-        )
-      )
+        ),
+      ),
     );
   }
 }
