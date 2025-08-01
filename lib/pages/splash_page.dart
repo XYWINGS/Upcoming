@@ -5,6 +5,10 @@ import 'package:flutter/services.dart';
 import 'package:get_it/get_it.dart';
 //Models
 import 'package:movie_app/models/app_config.dart';
+//Services
+import 'package:movie_app/services/http_service.dart';
+import 'package:movie_app/services/movie_service.dart';
+
 
 class SplashPage extends StatefulWidget {
   final VoidCallback onInitialized;
@@ -43,6 +47,10 @@ class SplashPageState extends State<SplashPage> {
         baseImageApiUrl: configMap['BASE_IMAGE_API_URL'],
       ),
     );
+
+    getIt.registerSingleton<HTTPService>(HTTPService());
+
+    getIt.registerSingleton<MovieService>(MovieService());
   }
 
   @override
