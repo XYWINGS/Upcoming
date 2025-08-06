@@ -19,9 +19,12 @@ class MainPageDataController extends StateNotifier<MainPageData> {
       List<Movie> movies = await movieService.getPopularMovies(
         page: state.page,
       );
-      state = state.copyWith(movies: movies, isLoading: false);
+      state = state.copyWith(
+        movies: [...state.movies, ...movies],
+        isLoading: false,
+        page: state.page + 1,
+      );
     } catch (e) {
-      // print('Error fetching movies: $e');
       state = state.copyWith(isLoading: false);
     }
   }

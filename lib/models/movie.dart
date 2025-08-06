@@ -33,7 +33,7 @@ class Movie {
       backdropUrl: json['backdrop_path'] as String,
       releaseDate: json['release_date'] as String,
       isAdult: json['adult'] as bool,
-      rating: json['vote-average'] as num,
+      rating: (json['vote_average'] ?? 0).toDouble(),
     );
   }
 

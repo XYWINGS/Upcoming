@@ -2,20 +2,23 @@
 import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:movie_app/controllers/main_page_data_controller.dart';
 //Models
 import 'package:movie_app/models/movie.dart';
 import 'package:movie_app/widgets/movie_tile.dart';
 import 'package:movie_app/models/category_selection.dart';
 import 'package:movie_app/models/main_page_data.dart';
-import 'package:movie_app/controllers/main_page_data_controller.dart';
 
-final mainPageDataController =
+final mainPageDataControllerProvider =
     StateNotifierProvider<MainPageDataController, MainPageData>((ref) {
       return MainPageDataController();
     });
 
 class MainPage extends ConsumerWidget {
   MainPage({super.key});
+
+  late MainPageDataController mainPageDataController;
+  late MainPageData mainPageData;
 
   final TextEditingController searchTextFieldController =
       TextEditingController();
@@ -24,6 +27,8 @@ class MainPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    mainPageDataController = ref.watch(mainPageDataControllerProvider.notifier);
+    mainPageData = ref.watch(mainPageDataControllerProvider);
     return _buildUI(screenWidth, screenHeight);
   }
 
@@ -175,9 +180,9 @@ class MainPage extends ConsumerWidget {
   }
 
   Widget movieListViewWidget(double screenWidth, double screenHeight) {
-    final List<Movie> movies = [];
+    final List<Movie> movies = mainPageData.movies;
 
-    if (movies.isNotEmpty) {
+    if (movies.isEmpty) {
       return Center(
         child: CircularProgressIndicator(backgroundColor: Colors.white54),
       );

@@ -13,6 +13,7 @@ class MovieService {
   MovieService() {
     http = getIt.get<HTTPService>();
   }
+
   Future<List<Movie>> getPopularMovies({required int page}) async {
     Response response = await http.get(
       '/movie/popular',
