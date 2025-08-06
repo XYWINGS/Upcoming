@@ -39,6 +39,6 @@ class Movie {
 
   String posterUrl() {
     final AppConfig config = GetIt.instance<AppConfig>();
-    return '${config.baseImageApiUrl}$posterUrl';
+    return '${config.baseImageApiUrl}$posterPath';
   }
 }

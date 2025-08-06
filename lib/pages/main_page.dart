@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 //Models
 import 'package:movie_app/models/category_selection.dart';
 import 'package:movie_app/models/movie.dart';
+import 'package:movie_app/widgets/movie_tile.dart';
 
 class MainPage extends ConsumerWidget {
   MainPage({super.key});
@@ -23,12 +24,13 @@ class MainPage extends ConsumerWidget {
 
   Widget _buildUI() {
     return Scaffold(
+      resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
       body: SizedBox(
         width: screenWidth,
         height: screenHeight,
         child: Center(
-          child: Stack(children: [backgroundWidget(), foreGroundWidgets()]),
+          child: Stack(children: [backgroundWidget(), foreGroundWidget()]),
         ),
       ),
     );
@@ -55,8 +57,9 @@ class MainPage extends ConsumerWidget {
       ),
     );
   }
+  
 
-  Widget foreGroundWidgets() {
+  Widget foreGroundWidget() {
     return Container(
       padding: EdgeInsets.fromLTRB(
         screenWidth * 0.05,
@@ -67,7 +70,7 @@ class MainPage extends ConsumerWidget {
       width: screenWidth,
       child: Column(
         mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
+        mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           topBarWidget(),
@@ -162,22 +165,7 @@ class MainPage extends ConsumerWidget {
   Widget movieListViewWidget() {
     final List<Movie> movies = [];
 
-    for (int i = 0; i < 10; i++) {
-      movies.add(
-        Movie(
-          name: 'Movie $i',
-          language: '',
-          description: '',
-          posterPath: '',
-          backdropUrl: '',
-          releaseDate: '',
-          isAdult: false,
-          rating: 1.5,
-        ),
-      );
-    }
-
-    if (movies.isEmpty) {
+    if (movies.isNotEmpty) {
       return Center(
         child: CircularProgressIndicator(backgroundColor: Colors.white54),
       );
@@ -192,9 +180,10 @@ class MainPage extends ConsumerWidget {
             ),
             child: GestureDetector(
               onTap: () => {},
-              child: Text(
-                movies[count].name,
-                style: TextStyle(color: Colors.white, fontSize: 16.0),
+              child: MovieTile(
+                height: screenHeight * 0.50,
+                width: screenWidth * 0.85,
+                movie: movies[count],
               ),
             ),
           );
