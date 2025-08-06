@@ -14,25 +14,35 @@ final mainPageDataControllerProvider =
       return MainPageDataController();
     });
 
+final selectedMoviePosterURLProvider = StateProvider<String>((ref) {
+  final movie = ref.watch(mainPageDataControllerProvider).movies;
+  return movie.isNotEmpty ? movie[0].posterUrl() : '';
+});
+
 class MainPage extends ConsumerWidget {
   MainPage({super.key});
 
   late MainPageDataController mainPageDataController;
   late MainPageData mainPageData;
+  late String backgroundMoviePosterURL;
 
-  final TextEditingController searchTextFieldController =
-      TextEditingController();
+  late TextEditingController searchTextFieldController;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    searchTextFieldController = TextEditingController();
+    searchTextFieldController.text = ref
+        .watch(mainPageDataControllerProvider)
+        .searchQuery;
     final screenWidth = MediaQuery.of(context).size.width;
     final screenHeight = MediaQuery.of(context).size.height;
+    backgroundMoviePosterURL = ref.watch(selectedMoviePosterURLProvider);
     mainPageDataController = ref.watch(mainPageDataControllerProvider.notifier);
     mainPageData = ref.watch(mainPageDataControllerProvider);
-    return _buildUI(screenWidth, screenHeight);
+    return _buildUI(screenWidth, screenHeight, ref);
   }
 
-  Widget _buildUI(double screenWidth, double screenHeight) {
+  Widget _buildUI(double screenWidth, double screenHeight, WidgetRef ref) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
@@ -43,7 +53,7 @@ class MainPage extends ConsumerWidget {
           child: Stack(
             children: [
               backgroundWidget(screenWidth, screenHeight),
-              foreGroundWidget(screenWidth, screenHeight),
+              foreGroundWidget(screenWidth, screenHeight, ref),
             ],
           ),
         ),
@@ -52,28 +62,40 @@ class MainPage extends ConsumerWidget {
   }
 
   Widget backgroundWidget(double screenWidth, double screenHeight) {
-    return Container(
-      height: screenHeight,
-      width: screenWidth,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
-        image: DecorationImage(
-          image: NetworkImage(
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
+    if (backgroundMoviePosterURL.isEmpty) {
+      return Container(
+        height: screenHeight,
+        width: screenWidth,
+        color: Colors.black,
+      );
+    } else {
+      return Container(
+        height: screenHeight,
+        width: screenWidth,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(10.0),
+          image: DecorationImage(
+            image: NetworkImage(backgroundMoviePosterURL),
+            fit: BoxFit.cover,
           ),
-          fit: BoxFit.cover,
         ),
-      ),
-      child: BackdropFilter(
-        filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
-        child: Container(
-          decoration: BoxDecoration(color: Colors.black.withValues(alpha: 0.2)),
+        child: BackdropFilter(
+          filter: ImageFilter.blur(sigmaX: 15.0, sigmaY: 15.0),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.black.withValues(alpha: 0.2),
+            ),
+          ),
         ),
-      ),
-    );
+      );
+    }
   }
 
-  Widget foreGroundWidget(double screenWidth, double screenHeight) {
+  Widget foreGroundWidget(
+    double screenWidth,
+    double screenHeight,
+    WidgetRef ref,
+  ) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         screenWidth * 0.05,
@@ -91,7 +113,7 @@ class MainPage extends ConsumerWidget {
           Container(
             height: screenHeight * 0.80,
             padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-            child: movieListViewWidget(screenWidth, screenHeight),
+            child: movieListViewWidget(screenWidth, screenHeight, ref),
           ),
         ],
       ),
@@ -127,7 +149,9 @@ class MainPage extends ConsumerWidget {
       height: screenHeight * 0.05,
       child: TextField(
         controller: searchTextFieldController,
-        onSubmitted: (input) {},
+        onSubmitted: (input) => {
+          mainPageDataController.updateSearchQuery(input),
+        },
         style: TextStyle(color: Colors.white, fontSize: 16.0),
         decoration: InputDecoration(
           focusedBorder: border,
@@ -147,7 +171,7 @@ class MainPage extends ConsumerWidget {
       width: screenWidth * 0.30,
       height: screenHeight * 0.05,
       child: DropdownButton<String>(
-        value: SearchCategory.popular,
+        value: mainPageData.searchCategory,
         icon: Icon(Icons.arrow_drop_down, color: Colors.white),
         items: [
           DropdownMenuItem<String>(
@@ -164,22 +188,21 @@ class MainPage extends ConsumerWidget {
               style: TextStyle(color: Colors.white),
             ),
           ),
-          DropdownMenuItem<String>(
-            value: SearchCategory.none,
-            child: Text(
-              SearchCategory.none,
-              style: TextStyle(color: Colors.white),
-            ),
-          ),
         ],
-        onChanged: (String? newValue) {},
+        onChanged: (dropDownValue) => dropDownValue.toString().isNotEmpty
+            ? mainPageDataController.updateSearchCategory(dropDownValue!)
+            : '',
         dropdownColor: Colors.black.withValues(alpha: 0.5),
         underline: Container(),
       ),
     );
   }
 
-  Widget movieListViewWidget(double screenWidth, double screenHeight) {
+  Widget movieListViewWidget(
+    double screenWidth,
+    double screenHeight,
+    WidgetRef ref,
+  ) {
     final List<Movie> movies = mainPageData.movies;
 
     if (movies.isEmpty) {
@@ -187,21 +210,38 @@ class MainPage extends ConsumerWidget {
         child: CircularProgressIndicator(backgroundColor: Colors.white54),
       );
     } else {
-      return ListView.builder(
-        itemCount: movies.length,
-        itemBuilder: (BuildContext context, int count) {
-          return Padding(
-            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
-            child: GestureDetector(
-              onTap: () => {},
-              child: MovieTile(
-                height: screenHeight * 0.4,
-                width: screenWidth * 0.85,
-                movie: movies[count],
-              ),
-            ),
-          );
+      return NotificationListener(
+        onNotification: (notification) {
+          if (notification is ScrollEndNotification) {
+            final before = notification.metrics.extentBefore;
+            final max = notification.metrics.maxScrollExtent;
+            if (before == max) {
+              mainPageDataController.getMovies();
+              return true;
+            }
+            return false;
+          }
+          return false;
         },
+        child: ListView.builder(
+          itemCount: movies.length,
+          itemBuilder: (BuildContext context, int count) {
+            return Padding(
+              padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
+              child: GestureDetector(
+                onTap: () {
+                  ref.read(selectedMoviePosterURLProvider.notifier).state =
+                      movies[count].posterUrl();
+                },
+                child: MovieTile(
+                  height: screenHeight * 0.3,
+                  width: screenWidth * 0.85,
+                  movie: movies[count],
+                ),
+              ),
+            );
+          },
+        ),
       );
     }
   }

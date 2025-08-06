@@ -30,7 +30,7 @@ class MovieTile extends StatelessWidget {
 
   Widget moviePosterWidget(String posterUrl) {
     return Container(
-      height: height * 0.5,
+      height: height * 0.9,
       width: width * 0.35,
       margin: const EdgeInsets.only(right: 12.0),
       decoration: BoxDecoration(
@@ -115,7 +115,7 @@ class MovieTile extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
               style: const TextStyle(
                 color: Colors.white,
-                fontSize: 8.0,
+                fontSize: 10.0,
                 height: 1.4,
               ),
             ),
