@@ -191,14 +191,11 @@ class MainPage extends ConsumerWidget {
         itemCount: movies.length,
         itemBuilder: (BuildContext context, int count) {
           return Padding(
-            padding: EdgeInsets.symmetric(
-              vertical: screenHeight * 0.01,
-              horizontal: 0,
-            ),
+            padding: EdgeInsets.symmetric(vertical: 0, horizontal: 0),
             child: GestureDetector(
               onTap: () => {},
               child: MovieTile(
-                height: screenHeight * 0.50,
+                height: screenHeight * 0.4,
                 width: screenWidth * 0.85,
                 movie: movies[count],
               ),

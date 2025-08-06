@@ -23,73 +23,104 @@ class MovieTile extends StatelessWidget {
       mainAxisSize: MainAxisSize.max,
       mainAxisAlignment: MainAxisAlignment.start,
       crossAxisAlignment: CrossAxisAlignment.start,
+
       children: [moviePosterWidget(movie.posterUrl()), movieInfoWidget()],
     );
   }
 
   Widget moviePosterWidget(String posterUrl) {
     return Container(
-      height: height,
+      height: height * 0.5,
       width: width * 0.35,
+      margin: const EdgeInsets.only(right: 12.0),
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(10.0),
+        borderRadius: BorderRadius.circular(12.0),
         image: DecorationImage(
-          image: NetworkImage(
-            'https://upload.wikimedia.org/wikipedia/commons/thumb/b/b6/Image_created_with_a_mobile_phone.png/1200px-Image_created_with_a_mobile_phone.png',
-          ),
+          image: NetworkImage(posterUrl),
           fit: BoxFit.cover,
         ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black26,
+            blurRadius: 6.0,
+            offset: Offset(0, 4),
+          ),
+        ],
       ),
     );
   }
 
   Widget movieInfoWidget() {
-    return Container(
+    return SizedBox(
       height: height,
       width: width * 0.65,
-      child: Column(
-        mainAxisSize: MainAxisSize.max,
-        mainAxisAlignment: MainAxisAlignment.start,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              SizedBox(
-                width: width * 0.55,
-                child: Text(
-                  movie.name,
-                  style: TextStyle(
-                    color: Colors.white,
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 8.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.start,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            /// Title and rating
+            Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Expanded(
+                  child: Text(
+                    movie.name,
+                    maxLines: 2,
                     overflow: TextOverflow.ellipsis,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 18.0,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
-              ),
-              Text(
-                movie.rating.toString(),
-                style: TextStyle(color: Colors.white, fontSize: 14.0),
-              ),
-            ],
-          ),
-          SizedBox(
-            child: Text(
-              '${movie.language.toUpperCase()} | R: ${movie.isAdult} | ${movie.releaseDate}',
-              style: TextStyle(color: Colors.white, fontSize: 12.0),
+                const SizedBox(width: 8.0),
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6.0,
+                    vertical: 2.0,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.amber,
+                    borderRadius: BorderRadius.circular(6.0),
+                  ),
+                  child: Text(
+                    movie.rating.toStringAsFixed(1),
+                    style: const TextStyle(
+                      color: Colors.black,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 12.0,
+                    ),
+                  ),
+                ),
+              ],
             ),
-          ),
-          SizedBox(
-            child: Text(
+
+            const SizedBox(height: 6.0),
+
+            /// Language, Age, Release Date
+            Text(
+              '${movie.language.toUpperCase()} | R: ${movie.isAdult ? "18+" : "PG"} | ${movie.releaseDate}',
+              style: const TextStyle(color: Colors.white70, fontSize: 12.0),
+            ),
+
+            const SizedBox(height: 8.0),
+
+            /// Description
+            Text(
               movie.description,
-              style: TextStyle(color: Colors.white, fontSize: 12.0),
-              maxLines: 3,
+              maxLines: 6,
               overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 8.0,
+                height: 1.4,
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }
