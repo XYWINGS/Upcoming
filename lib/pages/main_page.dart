@@ -3,26 +3,31 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 //Models
-import 'package:movie_app/models/category_selection.dart';
 import 'package:movie_app/models/movie.dart';
 import 'package:movie_app/widgets/movie_tile.dart';
+import 'package:movie_app/models/category_selection.dart';
+import 'package:movie_app/models/main_page_data.dart';
+import 'package:movie_app/controllers/main_page_data_controller.dart';
+
+final mainPageDataController =
+    StateNotifierProvider<MainPageDataController, MainPageData>((ref) {
+      return MainPageDataController();
+    });
 
 class MainPage extends ConsumerWidget {
   MainPage({super.key});
 
-  late double screenWidth;
-  late double screenHeight;
   final TextEditingController searchTextFieldController =
       TextEditingController();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    screenWidth = MediaQuery.of(context).size.width;
-    screenHeight = MediaQuery.of(context).size.height;
-    return _buildUI();
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+    return _buildUI(screenWidth, screenHeight);
   }
 
-  Widget _buildUI() {
+  Widget _buildUI(double screenWidth, double screenHeight) {
     return Scaffold(
       resizeToAvoidBottomInset: false,
       backgroundColor: Colors.black,
@@ -30,13 +35,18 @@ class MainPage extends ConsumerWidget {
         width: screenWidth,
         height: screenHeight,
         child: Center(
-          child: Stack(children: [backgroundWidget(), foreGroundWidget()]),
+          child: Stack(
+            children: [
+              backgroundWidget(screenWidth, screenHeight),
+              foreGroundWidget(screenWidth, screenHeight),
+            ],
+          ),
         ),
       ),
     );
   }
 
-  Widget backgroundWidget() {
+  Widget backgroundWidget(double screenWidth, double screenHeight) {
     return Container(
       height: screenHeight,
       width: screenWidth,
@@ -57,9 +67,8 @@ class MainPage extends ConsumerWidget {
       ),
     );
   }
-  
 
-  Widget foreGroundWidget() {
+  Widget foreGroundWidget(double screenWidth, double screenHeight) {
     return Container(
       padding: EdgeInsets.fromLTRB(
         screenWidth * 0.05,
@@ -73,18 +82,18 @@ class MainPage extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.end,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          topBarWidget(),
+          topBarWidget(screenWidth, screenHeight),
           Container(
             height: screenHeight * 0.80,
             padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
-            child: movieListViewWidget(),
+            child: movieListViewWidget(screenWidth, screenHeight),
           ),
         ],
       ),
     );
   }
 
-  Widget topBarWidget() {
+  Widget topBarWidget(double screenWidth, double screenHeight) {
     return Container(
       height: screenHeight * 0.08,
       decoration: BoxDecoration(
@@ -98,12 +107,15 @@ class MainPage extends ConsumerWidget {
         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
         crossAxisAlignment: CrossAxisAlignment.center,
         mainAxisSize: MainAxisSize.max,
-        children: [searchFieldWidget(), categorySelectionWidget()],
+        children: [
+          searchFieldWidget(screenWidth, screenHeight),
+          categorySelectionWidget(screenWidth, screenHeight),
+        ],
       ),
     );
   }
 
-  Widget searchFieldWidget() {
+  Widget searchFieldWidget(double screenWidth, double screenHeight) {
     final border = InputBorder.none;
     return SizedBox(
       width: screenWidth * 0.50,
@@ -125,7 +137,7 @@ class MainPage extends ConsumerWidget {
     );
   }
 
-  Widget categorySelectionWidget() {
+  Widget categorySelectionWidget(double screenWidth, double screenHeight) {
     return SizedBox(
       width: screenWidth * 0.30,
       height: screenHeight * 0.05,
@@ -162,7 +174,7 @@ class MainPage extends ConsumerWidget {
     );
   }
 
-  Widget movieListViewWidget() {
+  Widget movieListViewWidget(double screenWidth, double screenHeight) {
     final List<Movie> movies = [];
 
     if (movies.isNotEmpty) {
