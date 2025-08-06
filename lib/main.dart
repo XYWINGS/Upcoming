@@ -24,7 +24,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Upcoming',
       initialRoute: 'home',
-      routes: {'home': (BuildContext _context) => MainPage(key: UniqueKey())},
+      routes: {'home': (BuildContext context) => MainPage(key: UniqueKey())},
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),

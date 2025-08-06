@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 //Models
 import 'package:movie_app/models/category_selection.dart';
+import 'package:movie_app/models/movie.dart';
 
 class MainPage extends ConsumerWidget {
   MainPage({super.key});
@@ -23,7 +24,7 @@ class MainPage extends ConsumerWidget {
   Widget _buildUI() {
     return Scaffold(
       backgroundColor: Colors.black,
-      body: Container(
+      body: SizedBox(
         width: screenWidth,
         height: screenHeight,
         child: Center(
@@ -68,7 +69,14 @@ class MainPage extends ConsumerWidget {
         mainAxisSize: MainAxisSize.max,
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
-        children: [topBarWidget()],
+        children: [
+          topBarWidget(),
+          Container(
+            height: screenHeight * 0.80,
+            padding: EdgeInsets.symmetric(vertical: screenHeight * 0.01),
+            child: movieListViewWidget(),
+          ),
+        ],
       ),
     );
   }
@@ -94,7 +102,7 @@ class MainPage extends ConsumerWidget {
 
   Widget searchFieldWidget() {
     final border = InputBorder.none;
-    return Container(
+    return SizedBox(
       width: screenWidth * 0.50,
       height: screenHeight * 0.05,
       child: TextField(
@@ -115,7 +123,7 @@ class MainPage extends ConsumerWidget {
   }
 
   Widget categorySelectionWidget() {
-    return Container(
+    return SizedBox(
       width: screenWidth * 0.30,
       height: screenHeight * 0.05,
       child: DropdownButton<String>(
@@ -149,5 +157,49 @@ class MainPage extends ConsumerWidget {
         underline: Container(),
       ),
     );
+  }
+
+  Widget movieListViewWidget() {
+    final List<Movie> movies = [];
+
+    for (int i = 0; i < 10; i++) {
+      movies.add(
+        Movie(
+          name: 'Movie $i',
+          language: '',
+          description: '',
+          posterPath: '',
+          backdropUrl: '',
+          releaseDate: '',
+          isAdult: false,
+          rating: 1.5,
+        ),
+      );
+    }
+
+    if (movies.isEmpty) {
+      return Center(
+        child: CircularProgressIndicator(backgroundColor: Colors.white54),
+      );
+    } else {
+      return ListView.builder(
+        itemCount: movies.length,
+        itemBuilder: (BuildContext context, int count) {
+          return Padding(
+            padding: EdgeInsets.symmetric(
+              vertical: screenHeight * 0.01,
+              horizontal: 0,
+            ),
+            child: GestureDetector(
+              onTap: () => {},
+              child: Text(
+                movies[count].name,
+                style: TextStyle(color: Colors.white, fontSize: 16.0),
+              ),
+            ),
+          );
+        },
+      );
+    }
   }
 }

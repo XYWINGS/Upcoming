@@ -12,9 +12,9 @@ class HTTPService {
   String _api_key = '';
 
   HTTPService() {
-    AppConfig _config = getIt.get<AppConfig>();
-    _baseUrl = _config.baseAppUrl;
-    _api_key = _config.apiKey;
+    AppConfig config = getIt.get<AppConfig>();
+    _baseUrl = config.baseAppUrl;
+    _api_key = config.apiKey;
   }
 
   Future<Response> get(
@@ -22,16 +22,14 @@ class HTTPService {
     required Map<String, dynamic> query,
   }) async {
     try {
-      String _url = '$_baseUrl$path';
-      Map<String, dynamic> _query = {'api_key': _api_key, 'language': 'en-US'};
-      if (query != null) {
-        _query.addAll(query);
-      }
-      return await _dio.get(_url, queryParameters: _query);
+      String url = '$_baseUrl$path';
+      Map<String, dynamic> query0 = {'api_key': _api_key, 'language': 'en-US'};
+      query0.addAll(query);
+          return await _dio.get(url, queryParameters: query0);
     } on DioException catch (e) {
       print('Error in HTTPService.get: $e');
       print('Unable to perform get request');
-      throw e;
+      rethrow;
     }
   }
 }
